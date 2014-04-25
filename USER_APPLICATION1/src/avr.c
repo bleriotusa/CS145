@@ -16,30 +16,46 @@ int main (void)
 void
 read_keyPad(void)
 {
-	CLR_BIT(PORTC, 7);
-	CLR_BIT(PORTC, 6);
-	CLR_BIT(PORTC, 5);
-	CLR_BIT(PORTC, 4);
-	SET_BIT(PORTC, 3);
-	SET_BIT(PORTC, 2);
-	SET_BIT(PORTC, 1);
-	SET_BIT(PORTC, 0);
+	CLR_BIT(PORTC, 0);
+	CLR_BIT(PORTC, 1);
+	CLR_BIT(PORTC, 2);
+	CLR_BIT(PORTC, 3);
+	SET_BIT(PORTC, 4);
+	SET_BIT(PORTC, 5);
+	SET_BIT(PORTC, 6);
+	SET_BIT(PORTC, 7);
 	
 	for(;;)
 	{
-		for(int i = 0; i < 8; i++)
-		{
-			if(GET_BIT(PINC, i)){
-				CLR_BIT(PORTB, 0);
-				
-			}
-			else{
-				
-				SET_BIT(PORTB, 0);
-			}
-		}
-		
+		get_key();
 	}
+	
+
+}
+int get_key(void){
+	if(pressed(7,0))
+	{
+		CLR_BIT(PORTB,0);
+	}
+	else
+	{
+		SET_BIT(PORTB,0);
+	}
+	// i = column
+	//for(int i = 4; i < 8; i++)
+		//for(int j = 0; j < 4; j++)
+		//{
+			//if(pressed(i,j))
+			////return (j*4) + i +1;
+			//SET_BIT(PORTB,0);
+			//else
+			//CLR_BIT(PORTB,0);
+		//}
+	return 0;
+}
+_Bool pressed(int col, int row)
+{
+	return (GET_BIT(PINC, col));
 }
 void 
 start_led(void)
@@ -71,14 +87,14 @@ ini_avr(void)
 	CLR_BIT(DDRB, 1);
 	
 	// init keypad
-	SET_BIT(DDRC, 7);
-	SET_BIT(DDRC, 6);
-	SET_BIT(DDRC, 5);
-	SET_BIT(DDRC, 4);
-	CLR_BIT(DDRC, 3);
-	CLR_BIT(DDRC, 2);
-	CLR_BIT(DDRC, 1);
-	CLR_BIT(DDRC, 0);
+	SET_BIT(DDRC, 0);
+	SET_BIT(DDRC, 1);
+	SET_BIT(DDRC, 2);
+	SET_BIT(DDRC, 3);
+	CLR_BIT(DDRC, 4);
+	CLR_BIT(DDRC, 5);
+	CLR_BIT(DDRC, 6);
+	CLR_BIT(DDRC, 7);
 	
 }
 

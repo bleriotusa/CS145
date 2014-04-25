@@ -11,9 +11,11 @@
 #define CLR_BIT(p,i) ((p) &= ~(1 << (i)))
 #define GET_BIT(p,i) ((p) &   (1 << (i)))
 
+_Bool pressed(int col, int row);
 void ini_avr(void);
 void wait_avr(unsigned short msec);
 void start_led(void);
 void read_keyPad(void);
+int get_key(void);
 
 #endif
