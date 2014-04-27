@@ -17,7 +17,8 @@ void wait_avr(unsigned short msec);
 void start_led(void);
 void read_keyPad(void);
 int get_key(void);
-
+void LCD(void);
+void blinkNTimes(int n);
 #define WDR() asm volatile("wdr"::)
 #define NOP() asm volatile("nop"::)
 #define RST() for(;;);

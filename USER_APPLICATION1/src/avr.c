@@ -9,11 +9,16 @@ int main (void)
 {
 	ini_avr();
 	//start_led();
-	//read_keyPad();
-	ini_lcd();
-	put_str_lcd("hello world!");
-	
+	read_keyPad();
+
 	// Insert application code here, after the board has been initialized.
+	return 1;
+}
+void LCD(void)
+{
+	ini_lcd();
+	clr_lcd();
+	put_lcd('!');
 }
 void
 read_keyPad(void)
@@ -29,42 +34,42 @@ read_keyPad(void)
 	
 	for(;;)
 	{
-		get_key();
-
+		if(get_key()>0)
+		{
+			blinkNTimes(get_key());
+			//SET_BIT(PORTB, 0);
+		}
+		else
+			CLR_BIT(PORTB, 0);
 	}
 	
 
 }
-int get_key(void){
-
-	if(pressed(0,4))
+int get_key(void){	
+	// i is row
+	for(int i = 4; i < 8; ++i)
 	{
-		SET_BIT(PORTB, 0);
-		SET_BIT(PORTC, 0);
-		SET_BIT(PORTC, 4);
-	
+		for(int j = 0; j < 4; j++)
+		{
+			if(pressed(j,i))
+				return (i*4) + j +1;
+				//return 1;
+		}
 	}
-	else if(pressed(2,5))
-	{
-		SET_BIT(PORTB, 0);
-		SET_BIT(PORTC, 3);
-		SET_BIT(PORTC, 7);
-	}
-	else
-	{
-		CLR_BIT(PORTB,0);
-	}
-	// i = column
-	//for(int i = 4; i < 8; i++)
-		//for(int j = 0; j < 4; j++)
-		//{
-			//if(pressed(i,j))
-			////return (j*4) + i +1;
-			//SET_BIT(PORTB,0);
-			//else
-			//CLR_BIT(PORTB,0);
-		//}
 	return 0;
+}
+void blinkNTimes(int n)
+{	int msec = 500;
+	SET_BIT(PORTB, 0);
+
+	for(int i = 0; i < n; i++)
+	{
+		SET_BIT(PORTB, 0);
+		wait_avr(msec);
+		CLR_BIT(PORTB, 0);
+		wait_avr(msec);
+	}
+		
 }
 _Bool pressed(int col, int row)
 {
