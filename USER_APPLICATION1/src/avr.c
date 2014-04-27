@@ -2,44 +2,57 @@
 // Ellen Liu 54186168
 
 #include "avr.h"
-
+#include "lcd.h"
 
 
 int main (void)
 {
 	ini_avr();
 	//start_led();
-	read_keyPad();
+	//read_keyPad();
+	ini_lcd();
+	put_str_lcd("hello world!");
 	
 	// Insert application code here, after the board has been initialized.
 }
 void
 read_keyPad(void)
 {
-	CLR_BIT(PORTC, 0);
-	CLR_BIT(PORTC, 1);
-	CLR_BIT(PORTC, 2);
-	CLR_BIT(PORTC, 3);
-	SET_BIT(PORTC, 4);
-	SET_BIT(PORTC, 5);
-	SET_BIT(PORTC, 6);
 	SET_BIT(PORTC, 7);
+	SET_BIT(PORTC, 6);
+	SET_BIT(PORTC, 5);
+	SET_BIT(PORTC, 4);
+	SET_BIT(PORTC, 3);
+	SET_BIT(PORTC, 2);
+	SET_BIT(PORTC, 1);
+	SET_BIT(PORTC, 0);
 	
 	for(;;)
 	{
 		get_key();
+
 	}
 	
 
 }
 int get_key(void){
-	if(pressed(7,0))
+
+	if(pressed(0,4))
 	{
-		CLR_BIT(PORTB,0);
+		SET_BIT(PORTB, 0);
+		SET_BIT(PORTC, 0);
+		SET_BIT(PORTC, 4);
+	
+	}
+	else if(pressed(2,5))
+	{
+		SET_BIT(PORTB, 0);
+		SET_BIT(PORTC, 3);
+		SET_BIT(PORTC, 7);
 	}
 	else
 	{
-		SET_BIT(PORTB,0);
+		CLR_BIT(PORTB,0);
 	}
 	// i = column
 	//for(int i = 4; i < 8; i++)
@@ -55,7 +68,14 @@ int get_key(void){
 }
 _Bool pressed(int col, int row)
 {
-	return (GET_BIT(PINC, col));
+	//_Bool buttonPressed = 0;
+
+	CLR_BIT(PORTC, col);
+	//_Bool buttonPressed = !GET_BIT(PINC, col) && !GET_BIT(PINC, row);
+	//SET_BIT(PORTC, col);
+	return !GET_BIT(PINC, col) && !GET_BIT(PINC, row);
+
+	//SET_BIT(PORTC, col);
 }
 void 
 start_led(void)
@@ -87,14 +107,14 @@ ini_avr(void)
 	CLR_BIT(DDRB, 1);
 	
 	// init keypad
-	SET_BIT(DDRC, 0);
-	SET_BIT(DDRC, 1);
-	SET_BIT(DDRC, 2);
-	SET_BIT(DDRC, 3);
 	CLR_BIT(DDRC, 4);
 	CLR_BIT(DDRC, 5);
 	CLR_BIT(DDRC, 6);
 	CLR_BIT(DDRC, 7);
+	SET_BIT(DDRC, 0);
+	SET_BIT(DDRC, 1);
+	SET_BIT(DDRC, 2);
+	SET_BIT(DDRC, 3);
 	
 }
 

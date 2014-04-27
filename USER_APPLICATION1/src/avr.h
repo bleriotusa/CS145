@@ -18,4 +18,9 @@ void start_led(void);
 void read_keyPad(void);
 int get_key(void);
 
+#define WDR() asm volatile("wdr"::)
+#define NOP() asm volatile("nop"::)
+#define RST() for(;;);
+
+
 #endif

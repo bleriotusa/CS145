@@ -52,7 +52,8 @@ SUBDIRS :=  \
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
 ../src/ASF/mega/boards/stk600/rcx_x/init.c \
-../src/avr.c
+../src/avr.c \
+../src/lcd.c
 
 
 PREPROCESSING_SRCS += 
@@ -63,19 +64,23 @@ ASM_SRCS +=
 
 OBJS +=  \
 src/ASF/mega/boards/stk600/rcx_x/init.o \
-src/avr.o
+src/avr.o \
+src/lcd.o
 
 OBJS_AS_ARGS +=  \
 src/ASF/mega/boards/stk600/rcx_x/init.o \
-src/avr.o
+src/avr.o \
+src/lcd.o
 
 C_DEPS +=  \
 src/ASF/mega/boards/stk600/rcx_x/init.d \
-src/avr.d
+src/avr.d \
+src/lcd.d
 
 C_DEPS_AS_ARGS +=  \
 src/ASF/mega/boards/stk600/rcx_x/init.d \
-src/avr.d
+src/avr.d \
+src/lcd.d
 
 OUTPUT_FILE_PATH +=USER_APPLICATION1.elf
 
@@ -88,6 +93,8 @@ OUTPUT_FILE_DEP:= ./makedep.mk
 LIB_DEP+= 
 
 # AVR32/GNU C Compiler
+
+
 
 
 
