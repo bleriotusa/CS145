@@ -19,9 +19,12 @@ void read_keyPad(void);
 int get_key(void);
 void LCD(void);
 void blinkNTimes(int n);
+_Bool isValidKey(int key);
 void setDateTime(void);
 void resetLCD(void);
+_Bool isValidDate(int day, int month, int year);
 void incrementTime(void);
+void ini_keyPad(void);
 
 #define WDR() asm volatile("wdr"::)
 #define NOP() asm volatile("nop"::)

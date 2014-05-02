@@ -3,13 +3,16 @@
 
 #include "avr.h"
 #include "lcd.h"
-#define DATETABLE[] = {31,28,31,30,31,30,31,31,30,31,30,31};
+#include "stdio.h"
+
+int DATETABLE [12] = {31,28,31,30,31,30,31,31,30,31,30,31};
 
 int Day, Month, Year, Hour, Minutes, Seconds; 
 
 int main (void)
 {
-	//ini_avr();
+	ini_avr();
+	ini_keyPad();
 	//start_led();
 	//read_keyPad();
 	LCD();
@@ -20,25 +23,17 @@ int main (void)
 void LCD(void)
 {
 	ini_lcd();
-	put_str_lcd("hello!");
-	wait_avr(2000);
+	clr_lcd();
+	put_str_lcd("hi");
+	wait_avr(3000);
+	clr_lcd();	
 	
 	resetLCD();
-	setDateTime();
-	
-	while(1)
-	{
-		wait_avr(1000);
-		incrementTime();
-		char buf[10];
-		sprintf(buf, "%02i/%02i/%04i", Month, Day, Year);
-		put_str_lcd(buf);
-		buf[9];
-		sprintf(buf, "%02i:%02i:%02i", Hour, Minutes, Seconds);
-		put_str_lcd(buf);
-	}
-
-	
+	setDateTime();	
+}
+_Bool isValidKey(int key)
+{
+	return (key >= 0);
 }
 void resetLCD(void)
 {
@@ -50,9 +45,8 @@ void resetLCD(void)
 	put_str_lcd(buf);
 	
 	// print time line
-	buf[9];
 	pos_lcd(1, 2);
-	sprintf(buf, "%02s:%02s:%02s", "HH", "MIN", "SS");
+	sprintf(buf, "%02s:%02s:%02s", "HH", "MM", "SS");
 	put_str_lcd(buf);
 }
 
@@ -89,67 +83,107 @@ void setDateTime(void)
 {
 	// keep track of LCD pos
 	int row, col;
+	row = 0;
+	col = 2;
 	// number is the number entered
 	int number;
 	// counter to keep track of how many digits entered
 	int counter = 0;
 	// number to keep track of the number so far
 	int userInput = 0;
+	char buf[1]; 
+	do 
+	{
+		while(col < 10 || row != 1)
+		{
+			pos_lcd(row, col);
+			number = get_key();
+			if(isValidKey(number))
+			{
+				sprintf(buf, "%i", number);
+				put_str_lcd(buf);
+				wait_avr(400);
+
+				if(col >= 11 && row == 0)
+				{
+					row++;
+					col = 2;
+				}
+				else if(col <= 11)
+				{
+					col++;
+					if(col == 4 || col == 7)
+						col++;
+				}
+					
+				counter++;
+				if(counter%2 == 0 && counter != 6)
+					userInput += number;
+				else if(counter == 5)
+					userInput = 1000*number;
+				else if(counter == 6)
+					userInput += 100*number;
+				else if(counter == 7)
+					userInput += 10*number;
+				else 
+					userInput = 10*number;
+			
+			}
+			if(counter == 2)
+				Month = userInput;
+			else if(counter == 4)
+				Day = userInput;
+			else if(counter == 8)
+				Year = userInput;
+			else if(counter == 10)
+				Hour = userInput;
+			else if(counter == 12)
+				Minutes = userInput;
+			else if(counter == 14)
+				Seconds = userInput;
+		}
+		if(!isValidDate(Day, Month, Year))
+		{
+			clr_lcd();
+			sprintf(buf, "%s", "invalid date");
+			put_str_lcd(buf);
+			wait_avr(2000);
+			row = 0;
+			col = 2;
+
+			// counter to keep track of how many digits entered
+			counter = 0;
+			// number to keep track of the number so far
+			userInput = 0;
+			resetLCD();
+		}
+	}while(!isValidDate(Day, Month, Year));
+
 
 	while(1)
 	{
-		pos_lcd(row, col);
-		number = get_key();
-		if(number > 0)
-		{
-			put_lcd(number);
-			if(col > 13)
-			{
-				row++;
-				col = 4;
-			}
-			else
-				col++;
-			counter++;
-			if(counter%2 == 0 && counter != 6)
-				userInput += number;
-			else if(counter == 5)
-				userInput = 1000*number;
-			else if(counter == 6)
-				userInput = 100*number;
-			else 
-				userInput = 10*number;
-			
-		}
-		if(counter == 2)
-			Month = userInput;
-		else if(counter == 4)
-			Day = userInput;
-		else if(counter == 8)
-			Year = userInput;
-		else if(counter == 10)
-			Hour = userInput;
-		else if(counter == 12)
-			Minutes = userInput;
-		else if(counter == 14)
-			Seconds = userInput;
-		if(row >= 1 && col >= 12)
-			break;
-	} 
-	if(!isValidDate(Day, Month, Year)
-		resetLCD();
+		wait_avr(1000);
+		incrementTime();
+		pos_lcd(0, 2);
+		sprintf(buf, "%02i/%02i/%02i", Month, Day, Year);
+		put_str_lcd(buf);
+		pos_lcd(1, 2);
+		sprintf(buf, "%02i:%02i:%02i", Hour, Minutes, Seconds);
+		put_str_lcd(buf);
+	}	
 }
 _Bool isValidDate(int day, int month, int year)
 {
 	if(day > DATETABLE[month-1])
 	{
-		if((year%4 == 0) && (month == 1) && (day == 29) && (year%100 != 0))
-			return true;
-		return false;
+		if((year%4 == 0) && (month == 2) && (day == 29) && (year%100 != 0))
+			return 1;
+		return 0;
 	}
+	if(month > 12)
+		return 0;
 }
-void
-read_keyPad(void)
+void ini_keyPad(void)
 {
 	SET_BIT(PORTC, 7);
 	SET_BIT(PORTC, 6);
@@ -158,19 +192,22 @@ read_keyPad(void)
 	SET_BIT(PORTC, 3);
 	SET_BIT(PORTC, 2);
 	SET_BIT(PORTC, 1);
-	SET_BIT(PORTC, 0);
-	
+	SET_BIT(PORTC, 0);	
+}
+void
+read_keyPad(void)
+{	
 	for(;;)
 	{
-		if(get_key()>0)
+		if(get_key()>=0)
 		{
 			blinkNTimes(get_key());
+			if(get_key()==0)
+				blinkNTimes(2);
 		}
 		else
 			CLR_BIT(PORTB, 0);
 	}
-	
-
 }
 int get_key(void){	
 
